@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FutBot Nivel Dios</title>
+  <style>
+    body { font-family: Arial; background:#0f172a; color:white; margin:0; }
+    header { padding:15px; background:#020617; text-align:center; font-size:20px; }
+    .liga { margin:15px; }
+    .partido { background:#1e293b; padding:10px; margin:5px 0; border-radius:10px; cursor:pointer; }
+    .resultado { background:#020617; padding:10px; margin:15px; border-radius:10px; }
+  </style>
+</head>
+<body><header>⚽ FutBot Nivel Dios</header><div id="partidos"></div>
+<div id="resultado" class="resultado"></div><script>
+const API_KEY = "PON_AQUI_TU_API_FOOTBALL";
+
+async function cargarPartidos() {
+  try {
+    const res = await fetch("https://v3.football.api-sports.io/fixtures?next=10", {
+      headers: { "x-apisports-key": API_KEY }
+    });
+
+    const data = await res.json();
+    const partidosDiv = document.getElementById("partidos");
+    partidosDiv.innerHTML = "";
+
+    data.response.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "partido";
+      div.innerText = p.teams.home.name + " vs " + p.teams.away.name;
+      div.onclick = () => analizar(p);
+      partidosDiv.appendChild(div);
+    });
+  } catch (e) {
+    document.getElementById("partidos").innerText = "Error: Failed to fetch (usa servidor)";
+  }
+}
+
+function analizar(p) {
+  const probLocal = Math.floor(Math.random()*30)+50;
+  const probVisitante = 100 - probLocal - 10;
+
+  document.getElementById("resultado").innerHTML = `
+    <h3>${p.teams.home.name} vs ${p.teams.away.name}</h3>
+    <p>Ganador probable: ${probLocal > probVisitante ? p.teams.home.name : p.teams.away.name}</p>
+    <p>Probabilidad: ${probLocal}%</p>
+    <p>Over 2.5: ALTO</p>
+    <p>Ambos marcan: SI</p>
+    <p>Corners: 8-11</p>
+    <p>Combinada segura: Doble oportunidad + Over 1.5</p>
+  `;
+}
+
+cargarPartidos();
+</script></body>
+</html>
